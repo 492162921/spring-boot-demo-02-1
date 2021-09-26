@@ -1,0 +1,22 @@
+stages:
+- name: Build
+  steps:
+  - runScriptConfig:
+      image: 10.50.1.50/library/maven@sha256:a9f11fe04fdaf9bd8ac82bdd1af15fba0be8dc9b53cb1afbb842d541bf5b5b85
+      shellScript: mvn clean install
+- name: Publish
+  steps:
+  - publishImageConfig:
+      dockerfilePath: ./Dockerfile
+      buildContext: .
+      tag: shop/example-greenhouse:${CICD_EXECUTION_SEQUENCE}
+      pushRemote: true
+      registry: 10.50.1.50
+    env:
+      PLUGIN_DEBUG: "true"
+      PLUGIN_INSECURE: "true"
+- name: Deploy
+  steps:
+  - applyYamlConfig:
+      path: ./deployment.yaml
+notification: {}
